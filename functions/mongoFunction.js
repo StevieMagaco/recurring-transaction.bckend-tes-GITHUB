@@ -6,7 +6,7 @@ const async  = require( 'async' );
 const url = 'mongodb://localhost:27017';
  
 // Database Name
-const dbName = 'transactions';
+const dbName = 'interview_challenge';
 
 // Getting the difference between two dates
 const dayDiff = function(d1, d2)
