@@ -129,7 +129,7 @@ const recurringListCheck = function(db, element, callback) {
     //console.log('NAME: ' + element.name + 'ID: ' + element.user_id);
 
     // Find specific documents
-    collection.find({ name: element.name, user_id: element.user_id }).toArray(function(err, docs) {
+    collection.find({ $text: { $search: element.name }, user_id: element.user_id }).toArray(function(err, docs) {
       assert.equal(err, null);
       //console.log("-- RECURRING LIST COLLECTION FOUND --");
       //console.log(docs)
@@ -145,7 +145,7 @@ const treansferListRecurringCheck = function(db, element, callback) {
     //console.log('NAME: ' + element.name + 'ID: ' + element.user_id);
 
     // Find specific documents
-    collection.find({ name: element.name, user_id: element.user_id, amount: element.amount }).toArray( function(err, docs) {
+    collection.find({ $text: { $search: element.name }, user_id: element.user_id, amount: element.amount }).toArray( function(err, docs) {
       assert.equal(err, null);
       //console.log("-- TRANSFER LIST COLLECTION FOUND --");
       //console.log(docs)
