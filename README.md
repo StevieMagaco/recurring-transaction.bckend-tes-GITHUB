@@ -17,11 +17,9 @@ functions/mongoFunction.js - Location for all of the main transactional function
 
 Routes:
 
-/: GET = very basic helper homepage
+/: GET = This route returns the raw list of the Recurring List Collection
 
 /: POST = This is the main enrty point for inserting and processing new transactions
-
-/getRecurringlist: GET =  This page/route returns the raw list of the Recurring List Collection
 
 /getTransferlist:  GET = This page/route returns the raw list of the Transfer List Collection
 
