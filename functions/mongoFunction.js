@@ -78,7 +78,7 @@ const processNewTransfers = function( arr, db, callback ){
 
 //ADD NEW INCOMING TRANSACTIONS
 const addRecord = function(arr, res){
-    MongoClient.connect(url, function(err, client) {
+    MongoClient.connect(url, { useNewUrlParser: true }, function(err, client) {
         assert.equal(null, err);
           
         const db = client.db(dbName);
@@ -233,7 +233,7 @@ const addToReccuringList = function(db, element, callback) {
 
 //GET RECURRING LIST ==>
 const getRecurringListRecords = function(callback) {
-    MongoClient.connect(url, function(err, client) {
+    MongoClient.connect(url, { useNewUrlParser: true }, function(err, client) {
       assert.equal(null, err);
       console.log("Connected successfully to server");
         
@@ -261,7 +261,7 @@ const getAllRecurringDocuments = function(db, res, callback) {
 
 //GET TRANSFER LIST ==>
 const getTransfelListRecords = function(callback) {
-    MongoClient.connect(url, function(err, client) {
+    MongoClient.connect(url, { useNewUrlParser: true }, function(err, client) {
       assert.equal(null, err);
       console.log("Connected successfully to server");
         
@@ -289,7 +289,7 @@ const getAllTransferDocuments = function(db, res, callback) {
 
 //DELETE ALL RECORDS FROM TRANSFER LIST & RECURRING LIST ==>
 const removeAllDocuments = function(callback) {
-    MongoClient.connect(url, function(err, client) {
+    MongoClient.connect(url, { useNewUrlParser: true }, function(err, client) {
       assert.equal(null, err);
       console.log("Connected successfully to server");
         
@@ -319,7 +319,7 @@ const deleteAllDocuments = function(db, res, callback) {
 
 //ENSURING CREATION OF INDEX FOR SEARCH ==>
 const ensureIndex = function(callback) {
-    MongoClient.connect(url, function(err, client) {
+    MongoClient.connect(url, { useNewUrlParser: true }, function(err, client) {
       assert.equal(null, err);
         
       const db = client.db(dbName);
