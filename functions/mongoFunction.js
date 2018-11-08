@@ -8,6 +8,12 @@ const url = 'mongodb://localhost:27017';
 // Database Name
 const dbName = 'interview_challenge';
 
+// Transaction Table;
+const traColName = 'transaction_list';
+
+// Recurring Table;
+const RecColName = 'recurring_list';
+
 // Getting the difference between two dates
 const dayDiff = function(d1, d2)
 {
@@ -111,7 +117,7 @@ const addRecord = function(arr, res){
 //GET RECURRING LIST
 const getRecurring = function( db, res ){
     // Get the documents from collection
-    const collection = db.collection('recurring_list');
+    const collection = db.collection(RecColName);
     // Find all documents
     collection.find({}).toArray(function(err, docs) {
     assert.equal(err, null);
@@ -124,7 +130,7 @@ const getRecurring = function( db, res ){
 //CHECKS THE RECURRING LIST COLLECTION
 const recurringListCheck = function(db, element, callback) {
     // Get the documents from collection
-    const collection = db.collection('recurring_list');
+    const collection = db.collection(RecColName);
     //console.log("-- RECURRING LIST COLLECTION COMPARED TO --");
     //console.log('NAME: ' + element.name + 'ID: ' + element.user_id);
 
@@ -140,7 +146,7 @@ const recurringListCheck = function(db, element, callback) {
 //CHECKS THE TRANSFER LIST COLLECTION
 const treansferListRecurringCheck = function(db, element, callback) {
     // Get the documents from collection
-    const collection = db.collection('transaction_list');
+    const collection = db.collection(traColName);
     //console.log("-- TRANSFER LIST COLLECTION COMPARED TO --");
     //console.log('NAME: ' + element.name + 'ID: ' + element.user_id);
 
@@ -156,7 +162,7 @@ const treansferListRecurringCheck = function(db, element, callback) {
 //UPDATES A RECORD IN THE RECURRING LIST COLLECTION 
   const updateRecurringListRecord = function(db, element, callback) {
     // Get the recurring_list collection
-    const collection = db.collection('recurring_list');
+    const collection = db.collection(RecColName);
 
     // Find recurring list document
     collection.findOne({ name: element.name, user_id: element.user_id }, function(err, doc) {
@@ -195,7 +201,7 @@ const treansferListRecurringCheck = function(db, element, callback) {
 //ADDS A NEW RECORD TO THE TRANFER LIST COLLECTION
 const addToTransferList = function(db, element, callback) {
     // Get the documents collection
-    const collection = db.collection('transaction_list');
+    const collection = db.collection(traColName);
     // Insert document
     collection.insertOne( element , function(err, result) {
       assert.equal(err, null);
@@ -217,7 +223,7 @@ const addToReccuringList = function(db, element, callback) {
         transactions: [ element ],
     };
     // Get the documents collection
-    const collection = db.collection('recurring_list');
+    const collection = db.collection(RecColName);
     // Insert document
     collection.insertOne( item , function(err, result) {
       assert.equal(err, null);
@@ -244,7 +250,7 @@ const getRecurringListRecords = function(callback) {
 
 const getAllRecurringDocuments = function(db, res, callback) {
     // Get the documents collection
-    const collection = db.collection('recurring_list');
+    const collection = db.collection(RecColName);
     // Find some documents
     collection.find({}).toArray(function(err, docs) {
       assert.equal(err, null);
@@ -272,7 +278,7 @@ const getTransfelListRecords = function(callback) {
 
 const getAllTransferDocuments = function(db, res, callback) {
     // Get the documents collection
-    const collection = db.collection('transaction_list');
+    const collection = db.collection(traColName);
     // Find some documents
     collection.find({}).toArray(function(err, docs) {
       assert.equal(err, null);
@@ -300,12 +306,12 @@ const removeAllDocuments = function(callback) {
 
 const deleteAllDocuments = function(db, res, callback) {
     // Get the documents collection
-    const rcollection = db.collection('recurring_list');
+    const rcollection = db.collection(RecColName);
     //Delete all recods
     rcollection.deleteMany({});
     
     // Get the documents collection
-    const collection = db.collection('transaction_list');
+    const collection = db.collection(traColName);
     //Delete all recods
     collection.deleteMany({});
     
