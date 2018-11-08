@@ -23,9 +23,12 @@ const dayDiff = function(d1, d2)
 }
 
 //PROCESSING NEW INCOMING TRANSACTIONS
-const processNewTransfers = function( arr, db ){
+const processNewTransfers = function( arr, db, callback ){
     //PROCESSING THROUGH EACH ARR RECORD
+    var counter = 0;
+    var _callback = callback;
     async.eachSeries(arr, function(element, callback) {
+        console.log('-- Checing element --' + element.trans_id);
         //CHECKING RECURRING LIST COLLECTION FOR EXISTING RECURRING TRANSACTION
         recurringListCheck(db, element, function() {
             //IF TRANSACTION IS FOUND
@@ -33,7 +36,7 @@ const processNewTransfers = function( arr, db ){
                 // UPDATING RECURRING LIST RECORD
                 updateRecurringListRecord(db, element, function() {
                     // ADDING TRANSACTION TO TRANSACTION LIST
-                    addToTransferList(db, element, function() { callback(null); });
+                    addToTransferList(db, element, function() { callback(null); counter++; if(counter === arr.length){ _callback(null, 'two'); } });
                 });
             }
             else{
@@ -48,14 +51,14 @@ const processNewTransfers = function( arr, db ){
                             // UPDATING RECURRING LIST RECORD
                             updateRecurringListRecord(db, element, function() {
                                 // ADDING TRANSACTION TO TRANSACTION LIST
-                                addToTransferList(db, element, function() { callback(null); });
+                                addToTransferList(db, element, function() { callback(null); counter++; if(counter === arr.length){ _callback(null, 'two'); } });
                             });
                         });
                     }
                     else{
                         //IF TRANSACTION IS NOT FOUND
                         // ADDING TRANSACTION TO TRANSACTION LIST
-                        addToTransferList(db, element, function() { callback(null); });
+                        addToTransferList(db, element, function() { callback(null); counter++; if(counter === arr.length){ _callback(null, 'two'); } });
                     }
                 });
             }
@@ -66,56 +69,47 @@ const processNewTransfers = function( arr, db ){
           // One of the iterations produced an error.
           // All processing will now stop.
           //console.log('A file failed to process');
-          //console.log(err);
+          console.log(err);
         } else {
-          ////console.log('All files have been processed successfully');
+            
         }
-    });    
+    });
 }
 
 //ADD NEW INCOMING TRANSACTIONS
 const addRecord = function(arr, res){
     MongoClient.connect(url, function(err, client) {
         assert.equal(null, err);
-        //console.log("Connected successfully to server");
           
         const db = client.db(dbName);
 
-        async.series({
-            one: function(callback) {
-                setTimeout(function() {
-                    //PROCESSING TRANFERS
-                    console.log('-- PROCESSING TRANSFERS --');
-                    processNewTransfers( arr, db );
-                    callback(null, 1);
-                }, 300);
+        async.series([
+            function(callback) {
+                console.log('-- INDEX ENSURE --');
+                ensureIndex( callback );
+            },function(callback) {
+                console.log('-- PROCESSING TRANSFERS --');
+                processNewTransfers( arr, db, callback );
             },
-            two: function(callback){
-                setTimeout(function() {
-                    //SENDING RESPONSE
-                    console.log('-- SENDING RESPONSE --');
-                    getRecurring( db, res );
-                    callback(null, 2);
-                }, 200);
+            function(callback) {
+                console.log('-- RETURNING RECURRING LIST --');
+                getRecurring( db, res, callback );
             },
-            three: function(callback){
-                setTimeout(function() {
-                    //CLOSING MONGO CONNECTION
-                    console.log('-- CLOSING MONGODB CONNECTION --');
-                    client.close();
-                    callback(null, 3);
-                }, 100);
+            function(callback) {
+                console.log('-- CLOSING MONGODB CONNECTION --');
+                client.close();
+                callback(null, 'four');
             }
-        }, function(err, results) {
-            // results is now equal to: {one: 1, two: 2}
+        ],
+        // optional callback
+        function(err, results) {
+            // results is now equal to ['one', 'two']
         });
-
-        
     });
 }
 
 //GET RECURRING LIST
-const getRecurring = function( db, res ){
+const getRecurring = function( db, res, callback ){
     // Get the documents from collection
     const collection = db.collection(RecColName);
     // Find all documents
@@ -123,6 +117,7 @@ const getRecurring = function( db, res ){
     assert.equal(err, null);
     //console.log("Found the following Recurring records");
     //console.log(docs)
+    callback(null, 'three');
     res.send(docs);
     });
 }
@@ -135,6 +130,7 @@ const recurringListCheck = function(db, element, callback) {
     //console.log('NAME: ' + element.name + 'ID: ' + element.user_id);
 
     // Find specific documents
+    // FOR AN INDEX SEARCH USE // $text: { $search: element.name } // INSTEAD OF // name: element.name //
     collection.find({ $text: { $search: element.name }, user_id: element.user_id }).toArray(function(err, docs) {
       assert.equal(err, null);
       //console.log("-- RECURRING LIST COLLECTION FOUND --");
@@ -151,6 +147,7 @@ const treansferListRecurringCheck = function(db, element, callback) {
     //console.log('NAME: ' + element.name + 'ID: ' + element.user_id);
 
     // Find specific documents
+    // FOR AN INDEX SEARCH USE // $text: { $search: element.name } // INSTEAD OF // name: element.name //
     collection.find({ $text: { $search: element.name }, user_id: element.user_id, amount: element.amount }).toArray( function(err, docs) {
       assert.equal(err, null);
       //console.log("-- TRANSFER LIST COLLECTION FOUND --");
@@ -316,6 +313,33 @@ const deleteAllDocuments = function(db, res, callback) {
     collection.deleteMany({});
     
     res.send('Collections Emptied');
+    callback();
+  }
+// <==
+
+//ENSURING CREATION OF INDEX FOR SEARCH ==>
+const ensureIndex = function(callback) {
+    MongoClient.connect(url, function(err, client) {
+      assert.equal(null, err);
+        
+      const db = client.db(dbName);
+
+      createIndex(db, function() {
+            callback(null, 'one');
+            client.close();
+        });
+    });
+}
+
+const createIndex = function(db, callback) {
+    console.log('-- indexes --')
+    // Get the documents collection
+    const rcollection = db.collection(RecColName);
+    rcollection.createIndex({name: 'text'})
+    
+    // Get the documents collection
+    const tcollection = db.collection(traColName);
+    tcollection.createIndex({name: 'text'})
     callback();
   }
 // <==
