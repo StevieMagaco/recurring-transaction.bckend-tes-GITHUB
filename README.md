@@ -1,6 +1,12 @@
 # recurring-transaction.bckend-test
 This is project was built to test the functionality for the back-end of a recurring transaction system.
 
+## Run:
+
+1. npm i / npm install
+
+2. node app.js / npm start
+
 ## Structure:
 
 App.js - Top Level for the Node.js back-end structure
