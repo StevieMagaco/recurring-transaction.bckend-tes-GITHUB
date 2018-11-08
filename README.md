@@ -11,6 +11,12 @@ This is a Express/Node.js project was built to test the functionality for the ba
 
 "mongodb": Database
 
+## URL / PORT
+
+Node server: http://localhost:1984/
+
+MongoDB: mongodb://localhost:27017/
+
 ## Run:
 
 1. npm i / npm install
