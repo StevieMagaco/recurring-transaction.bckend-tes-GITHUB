@@ -1,5 +1,15 @@
 # recurring-transaction.bckend-test
-This is project was built to test the functionality for the back-end of a recurring transaction system.
+This is a Express/Node.js project was built to test the functionality for the back-end of a recurring transaction system.
+
+## Dependencies
+
+"async": Used to synchronously control arrays of transactions and their following actions
+
+"body-parser": Used to parse the incoming post object
+
+"express": Framework
+
+"mongodb": Database
 
 ## Run:
 
