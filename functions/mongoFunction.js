@@ -22,6 +22,38 @@ const dayDiff = function(d1, d2)
   return new Number(d2 - d1).toFixed(0);
 }
 
+//ADD NEW INCOMING TRANSACTIONS
+const addRecord = function(arr, res){
+    MongoClient.connect(url, { useNewUrlParser: true }, function(err, client) {
+        assert.equal(null, err);
+          
+        const db = client.db(dbName);
+
+        async.series([
+            function(callback) {
+                console.log('-- INDEX ENSURE --');
+                ensureIndex( callback );
+            },function(callback) {
+                console.log('-- PROCESSING TRANSFERS --');
+                processNewTransfers( arr, db, callback );
+            },
+            function(callback) {
+                console.log('-- RETURNING RECURRING LIST --');
+                getRecurring( db, res, callback );
+            },
+            function(callback) {
+                console.log('-- CLOSING MONGODB CONNECTION --');
+                client.close();
+                callback(null, 'four');
+            }
+        ],
+        // optional callback
+        function(err, results) {
+            // results is now equal to ['one', 'two']
+        });
+    });
+}
+
 //PROCESSING NEW INCOMING TRANSACTIONS
 const processNewTransfers = function( arr, db, callback ){
     //PROCESSING THROUGH EACH ARR RECORD
@@ -73,38 +105,6 @@ const processNewTransfers = function( arr, db, callback ){
         } else {
             
         }
-    });
-}
-
-//ADD NEW INCOMING TRANSACTIONS
-const addRecord = function(arr, res){
-    MongoClient.connect(url, { useNewUrlParser: true }, function(err, client) {
-        assert.equal(null, err);
-          
-        const db = client.db(dbName);
-
-        async.series([
-            function(callback) {
-                console.log('-- INDEX ENSURE --');
-                ensureIndex( callback );
-            },function(callback) {
-                console.log('-- PROCESSING TRANSFERS --');
-                processNewTransfers( arr, db, callback );
-            },
-            function(callback) {
-                console.log('-- RETURNING RECURRING LIST --');
-                getRecurring( db, res, callback );
-            },
-            function(callback) {
-                console.log('-- CLOSING MONGODB CONNECTION --');
-                client.close();
-                callback(null, 'four');
-            }
-        ],
-        // optional callback
-        function(err, results) {
-            // results is now equal to ['one', 'two']
-        });
     });
 }
 
